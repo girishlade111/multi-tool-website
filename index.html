@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Tool Calculator Hub</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #38b000;
+            --warning: #ffaa00;
+            --danger: #d90429;
+            --gray: #adb5bd;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f0f2f5;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            background-color: var(--light);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+            color: #555;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 3rem 0;
+        }
+        
+        .tool-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
+        }
+        
+        .tool-card-header {
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+        
+        .tool-card.featured .tool-card-header {
+            background: linear-gradient(135deg, var(--secondary) 0%, #560bad 100%);
+        }
+        
+        .tool-card-body {
+            padding: 1.5rem;
+        }
+        
+        .tool-card h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        
+        .tool-card p {
+            margin: 0.8rem 0;
+            color: #666;
+            font-size: 0.95rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .tool-content {
+            display: none;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            margin: 2rem 0;
+        }
+        
+        .tool-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+        }
+        
+        .result-section {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            border: 1px solid #eee;
+        }
+        
+        .notification {
+            padding: 0.8rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .notification.success {
+            background-color: rgba(56, 176, 0, 0.15);
+            border: 1px solid rgba(56, 176, 0, 0.3);
+            color: var(--success);
+        }
+        
+        .notification.warning {
+            background-color: rgba(255, 170, 0, 0.15);
+            border: 1px solid rgba(255, 170, 0, 0.3);
+            color: var(--warning);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            background-color: var(--secondary);
+            border-radius: 20px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+        
+        .tool-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+        
+        .tool-nav-item {
+            padding: 0.6rem 1rem;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .tool-nav-item.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .tool-nav-item:hover:not(.active) {
+            background-color: #f0f0f0;
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        
+        .footer-column {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .footer-column h4 {
+            margin-bottom: 1.2rem;
+            font-size: 1.1rem;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-column a {
+            color: #bbb;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer-column a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+        
+        /* Video Transcript Generator Specific Styles */
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            background-color: #f8f9fa;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .upload-area i {
+            font-size: 2.5rem;
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+        
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .upload-area input[type="file"] {
+            display: none;
+        }
+        
+        .progress-container {
+            margin: 1rem 0;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .transcript-result {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            box-shadow: var(--card-shadow);
+            display: none;
+        }
+        
+        .transcript-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .transcript-text {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #eee;
+            white-space: pre-line;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+            }
+        }
+    </style>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <a href="#" class="logo">MultiCalc</a>
+            <nav class="nav-links">
+                <a href="#">Home</a>
+                <a href="#tools">Tools</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>All-in-One Calculator Hub</h1>
+            <p>Simplify your calculations with our comprehensive suite of calculators and utilities designed for students, professionals, and everyone in between.</p>
+        </div>
+    </section>
+    
+    <!-- Tools Navigation -->
+    <section id="tools" class="container">
+        <h2 style="margin: 2rem 0 1rem; text-align: center;">Our Tools</h2>
+        <div class="tool-nav">
+            <div class="tool-nav-item active" data-tool="video-transcript">Video Transcript Generator <span class="badge">NEW</span></div>
+            <div class="tool-nav-item" data-tool="srm-cgpa">SRM CGPA Calculator</div>
+            <div class="tool-nav-item" data-tool="vit-cgpa">VIT CGPA Calculator</div>
+            <div class="tool-nav-item" data-tool="loshu-grid">Lo Shu Grid Calculator</div>
+            <div class="tool-nav-item" data-tool="sgpa">SGPA Calculator</div>
+            <div class="tool-nav-item" data-tool="lic-surrender">LIC Surrender Value</div>
+            <div class="tool-nav-item" data-tool="ms-plate">MS Plate Weight</div>
+            <div class="tool-nav-item" data-tool="tneb-bill">TNEB Bill Calculator</div>
+            <div class="tool-nav-item" data-tool="cpc-pay">7th CPC Pay Calculator</div>
+        </div>
+        
+        <!-- Tool Content Sections -->
+        <!-- Video Transcript Generator Tool -->
+        <div id="video-transcript" class="tool-content active">
+            <h2>Video Transcript Generator</h2>
+            <p>Convert your video content into text automatically to enhance SEO and accessibility.</p>
+            
+            <div class="notification warning">
+                <i class="fas fa-info-circle"></i> For optimal performance, use videos with clear audio and under 100MB in size.
+            </div>
+            
+            <div class="upload-area" id="dropArea">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Drag & Drop your video</h3>
+                <p>Or click to browse files</p>
+                <input type="file" id="videoInput" accept="video/*">
+            </div>
+            
+            <div class="form-group">
+                <label for="language">Language</label>
+                <select class="form-control" id="language">
+                    <option value="en-US">English (US)</option>
+                    <option value="en-GB">English (UK)</option>
+                    <option value="es-ES">Spanish</option>
+                    <option value="fr-FR">French</option>
+                    <option value="de-DE">German</option>
+                    <option value="hi-IN">Hindi</option>
+                </select>
+            </div>
+            
+            <div class="progress-container" style="display: none;">
+                <p><span id="status">Processing...</span> <span id="progressPercent">0%</span></p>
+                <div class="progress-bar">
+                    <div class="progress" id="progressBar"></div>
+                </div>
+            </div>
+            
+            <button id="generateBtn" class="btn" style="width: 100%;">Generate Transcript</button>
+            
+            <div class="transcript-result" id="transcriptResult">
+                <div class="transcript-controls">
+                    <h3>Transcript Result</h3>
+                    <div>
+                        <button id="copyBtn" class="btn" style="background-color: var(--success);">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <button id="downloadBtn" class="btn" style="background-color: var(--secondary);">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+                <div class="transcript-text" id="transcriptText"></div>
+            </div>
+        </div>
+        
+        <!-- SRM CGPA Calculator -->
+        <div id="srm-cgpa" class="tool-content">
+            <h2>SRM CGPA Calculator</h2>
+            <p>Calculate your Cumulative Grade Point Average for SRM University.</p>
+            
+            <div id="semestersContainer">
+                <div class="form-group">
+                    <label>Number of Semesters</label>
+                    <select id="semesterCount" class="form-control">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                    </select>
+                </div>
+                
+                <div id="semesterInputs">
+                    <div class="form-group">
+                        <label>Semester 1 GPA</label>
+                        <input type="number" class="form-control semester-gpa" min="0" max="10" step="0.01" placeholder="Enter GPA (0-10)">
+                    </div>
+                </div>
+            </div>
+            
+            <button id="calculateSrmCgpa" class="btn">Calculate CGPA</button>
+            
+            <div class="result-section" id="srmCgpaResult" style="display: none;">
+                <h3>Your CGPA Results</h3>
+                <p>Cumulative GPA: <strong id="srmCgpaValue">0.00</strong></p>
+                <p>Percentage Equivalent: <strong id="srmPercentage">0.00%</strong></p>
+            </div>
+        </div>
+        
+        <!-- Other calculator tools would be implemented in a similar way -->
+        <!-- VIT CGPA Calculator -->
+        <div id="vit-cgpa" class="tool-content">
+            <h2>VIT CGPA Calculator</h2>
+            <p>Calculate your Cumulative Grade Point Average for VIT University.</p>
+            <!-- Form elements would go here -->
+            <p>This calculator is under development. Check back soon!</p>
+        </div>
+        
+        <!-- Lo Shu Grid Calculator -->
+        <div id="loshu-grid" class="tool-content">
+            <h2>Lo Shu Grid Calculator</h2>
+            <p>Generate and analyze Lo Shu Grid based on your birth date.</p>
+            <!-- Form elements would go here -->
+            <p>This calculator is under development. Check back soon!</p>
+        </div>
+        
+        <!-- SGPA Calculator -->
+        <div id="sgpa" class="tool-content">
+            <h2>SGPA Calculator</h2>
+            <p>Calculate your Semester Grade Point Average.</p>
+            <!-- Form elements would go here -->
+            <p>This calculator is under development. Check back soon!</p>
+        </div>
+        
+        <!-- LIC Surrender Value Calculator -->
+        <div id="lic-surrender" class="tool-content">
+            <h2>LIC Surrender Value Calculator</h2>
+            <p>Calculate the surrender value of your LIC policy.</p>
+            <!-- Form elements would go here -->
+            <p>This calculator is under development. Check back soon!</p>
+        </div>
+        
+        <!-- MS Plate Weight Calculator -->
+        <div id="ms-plate" class="tool-content">
+            <h2>MS Plate Weight Calculator</h2>
+            <p>Calculate the weight of Mild Steel plates based on dimensions.</p>
+            <!-- Form elements would go here -->
+            <p>This calculator is under development. Check back soon!</p>
+        </div>
+        
+        <!-- TNEB Bill Calculator -->
+        <div id="tneb-bill" class="tool-content">
+            <h2>TNEB Bill Calculator</h2>
+            <p>Calculate your Tamil Nadu Electricity Board bill amount.</p>
+            <!-- Form elements would go here -->
+            <p>This calculator is under development. Check back soon!</p>
+        </div>
+        
+        <!-- 7th CPC Pay Calculator -->
+        <div id="cpc-pay" class="tool-content">
+            <h2>7th CPC Pay Calculator</h2>
+            <p>Calculate your salary as per 7th Central Pay Commission recommendations.</p>
+            <!-- Form elements would go here -->
+            <p>This calculator is under development. Check back soon!</p>
+        </div>
+    </section>
+    
+    <!-- Featured Tools Grid -->
+    <section class="container">
+        <h2 style="margin: 2rem 0 1rem; text-align: center;">Popular Calculators</h2>
+        <div class="tools-grid">
+            <div class="tool-card featured">
+                <div class="tool-card-header">
+                    <h3>Video Transcript Generator <span class="badge">NEW</span></h3>
+                </div>
+                <div class="tool-card-body">
+                    <p>Convert your videos to text automatically. Perfect for content creators, educators, and businesses looking to improve SEO and accessibility.</p>
+                    <a href="#" class="btn" data-tool="video-transcript">Try Now</a>
+                </div>
+            </div>
+            
+            <div class="tool-card">
+                <div class="tool-card-header">
+                    <h3>SRM CGPA Calculator</h3>
+                </div>
+                <div class="tool-card-body">
+                    <p>Calculate your cumulative GPA at SRM University with our easy-to-use calculator. Get instant results and percentage equivalents.</p>
+                    <a href="#" class="btn" data-tool="srm-cgpa">Calculate</a>
+                </div>
+            </div>
+            
+            <div class="tool-card">
+                <div class="tool-card-header">
+                    <h3>Lo Shu Grid Calculator</h3>
+                </div>
+                <div class="tool-card-body">
+                    <p>Generate your Lo Shu Grid based on your birth date. Discover the numerological significance and potential insights.</p>
+                    <a href="#" class="btn" data-tool="loshu-grid">Generate</a>
+                </div>
+            </div>
+            
+            <div class="tool-card">
+                <div class="tool-card-header">
+                    <h3>TNEB Bill Calculator</h3>
+                </div>
+                <div class="tool-card-body">
+                    <p>Estimate your Tamil Nadu Electricity Board bill amount based on your consumption. Plan your budget effectively.</p>
+                    <a href="#" class="btn" data-tool="tneb-bill">Calculate</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-column">
+                <h4>MultiCalc</h4>
+                <p>Your one-stop solution for all calculation needs.</p>
+            </div>
+            
+            <div class="footer-column">
+                <h4>Tools</h4>
+                <ul>
+                    <li><a href="#" data-tool="video-transcript">Video Transcript Generator</a></li>
+                    <li><a href="#" data-tool="srm-cgpa">SRM CGPA Calculator</a></li>
+                    <li><a href="#" data-tool="vit-cgpa">VIT CGPA Calculator</a></li>
+                    <li><a href="#" data-tool="loshu-grid">Lo Shu Grid Calculator</a></li>
+                    <li><a href="#" data-tool="sgpa">SGPA Calculator</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h4>More Tools</h4>
+                <ul>
+                    <li><a href="#" data-tool="lic-surrender">LIC Surrender Value</a></li>
+                    <li><a href="#" data-tool="ms-plate">MS Plate Weight</a></li>
+                    <li><a href="#" data-tool="tneb-bill">TNEB Bill Calculator</a></li>
+                    <li><a href="#" data-tool="cpc-pay">7th CPC Pay Calculator</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#privacy">Privacy Policy</a></li>
+                    <li><a href="#terms">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="container copyright">
+            <p>&copy; 2025 MultiCalc. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <!-- JavaScript for the tools -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tool Navigation
+            const toolNavItems = document.querySelectorAll('.tool-nav-item');
+            const toolContents = document.querySelectorAll('.tool-content');
+            
+            toolNavItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const toolId = this.getAttribute('data-tool');
+                    
+                    // Remove active class from all items
+                    toolNavItems.forEach(navItem => navItem.classList.remove('active'));
+                    toolContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked item and corresponding content
+                    this.classList.add('active');
+                    document.getElementById(toolId).classList.add('active');
+                });
+            });
+            
+            // Tool links in featured cards and footer
+            const toolLinks = document.querySelectorAll('[data-tool]');
+            toolLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const toolId = this.getAttribute('data-tool');
+                    
+                    // Scroll to tools section
+                    document.getElementById('tools').scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Activate the corresponding tool
+                    setTimeout(() => {
+                        toolNavItems.forEach(navItem => {
+                            if(navItem.getAttribute('data-tool') === toolId) {
+                                navItem.click();
+                            }
+                        });
+                    }, 500);
+                });
+            });
+            
+            // Video Transcript Generator
+            const dropArea = document.getElementById('dropArea');
+            const videoInput = document.getElementById('videoInput');
+            const generateBtn = document.getElementById('generateBtn');
+            const progressContainer = document.querySelector('.progress-container');
+            const progressBar = document.getElementById('progressBar');
+            const progressPercent = document.getElementById('progressPercent');
+            const status = document.getElementById('status');
+            const transcriptResult = document.getElementById('transcriptResult');
+            const transcriptText = document.getElementById('transcriptText');
+            const copyBtn = document.getElementById('copyBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            // File upload via click
+            dropArea.addEventListener('click', () => {
+                videoInput.click();
+            });
+            
+            // File upload via drag and drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, () => {
+                    dropArea.classList.add('dragover');
+                }, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, () => {
+                    dropArea.classList.remove('dragover');
+                }, false);
+            });
+            
+            dropArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                videoInput.files = files;
+            }
+            
+            // Generate transcript 
+            generateBtn.addEventListener('click', function() {
+                const file = videoInput.files[0];
+                if (!file) {
+                    alert('Please select a video file first');
+                    return;
+                }
+                
+                // Simulating transcript generation process
+                progressContainer.style.display = 'block';
+                generateBtn.disabled = true;
+                
+                // Mock progress updates
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 10;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        finishTranscription();
+                    }
+                    
+                    progressBar.style.width = `${progress}%`;
+                    progressPercent.textContent = `${Math.round(progress)}%`;
+                    
+                    // Update status text based on progress
+                    if (progress < 30) {
+                        status.textContent = 'Analyzing audio...';
+                    } else if (progress < 60) {
+                        status.textContent = 'Converting speech to text...';
+                    } else if (progress < 90) {
+                        status.textContent = 'Formatting transcript...';
+                    } else {
+                        status.textContent = 'Finalizing...';
+                    }
+                }, 500);
+            });
+            
+            function finishTranscription() {
+                // Generate mock transcript text
+                const mockTranscript = 
+                `[00:00:01] Welcome to our video on modern web development techniques.
+                
+[00:00:07] Today we'll be exploring how to build responsive web applications using the latest frameworks and tools.
+
+[00:00:15] First, let's talk about the importance of responsive design. With the increasing variety of devices accessing the web, ensuring your site works well on all screen sizes is critical.
+
+[00:00:32] Using CSS Grid and Flexbox can greatly simplify the process of creating responsive layouts.
+
+[00:00:48] Another important aspect is performance optimization. Users expect websites to load quickly, and search engines reward fast-loading sites with better rankings.
+
+[00:01:05] Let
